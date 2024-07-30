@@ -41,11 +41,22 @@ def handler(event, context):
     config = get_config(PARAMETER_STORE_PREFIX, PARAMETER_NAMES)
 
     # Select a model provider to perform the code generation
-    if config["model_provider"] == "bedrock":
+    # if config["model_provider"] == "bedrock":
+    #     provider = Claude(model_aws_region=MODEL_AWS_REGION)
+    # else:
+    #     raise Exception(f"Invalid model provider: {config['model_provider']}")
+    # logger.info(f"Using model provider: {config['model_provider']}")
+    model_provider = config.get('model_provider')
+    if model_provider is None:
+        logger.error("Missing configuration for 'model_provider'")
+        return  # Optionally, handle the error as appropriate
+
+    # Continue with the existing logic...
+    if model_provider == "bedrock":
         provider = Claude(model_aws_region=MODEL_AWS_REGION)
     else:
-        raise Exception(f"Invalid model provider: {config['model_provider']}")
-    logger.info(f"Using model provider: {config['model_provider']}")
+        logger.error(f"Invalid model provider: {model_provider}")
+        return
 
     # Prepare SSH credentials for cloning the target repo
     tmpdir = tempfile.mkdtemp()
